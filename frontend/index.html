@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartGate - Controle de Portão</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/mobile.css">
+</head>
+<body>
+    <!-- Cabeçalho -->
+    <header class="navbar navbar-expand-lg navbar-dark bg-primary sticky-top">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center" href="#">
+                <i class="fas fa-door-open me-2"></i>
+                <span>SmartGate</span>
+            </a>
+            
+            <!-- Status de Conexão Bluetooth -->
+            <div class="bluetooth-status ms-auto me-3">
+                <span id="bluetooth-icon" class="bluetooth-icon disconnected">
+                    <i class="fab fa-bluetooth-b"></i>
+                </span>
+                <span id="bluetooth-status-text" class="d-none d-sm-inline">Desconectado</span>
+            </div>
+            
+            <!-- Botão de Menu Mobile -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarMain">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Menu de Navegação -->
+            <div class="collapse navbar-collapse" id="navbarMain">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#" data-page="home">
+                            <i class="fas fa-home"></i> Início
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="logs">
+                            <i class="fas fa-list"></i> Logs
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="settings">
+                            <i class="fas fa-cog"></i> Configurações
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-page="admin" id="admin-link">
+                            <i class="fas fa-user-shield"></i> Admin
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" id="login-link">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main class="container my-4">
+        <!-- Página Inicial -->
+        <section id="page-home" class="page-section active">
+            <div class="row">
+                <!-- Status do Portão -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fas fa-door-open"></i> Status do Portão</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <div class="gate-status-display">
+                                <div id="gate-status-icon" class="gate-icon gate-unknown">
+                                    <i class="fas fa-question"></i>
+                                </div>
+                                <h3 id="gate-status-text">Desconhecido</h3>
+                            </div>
+                            <div class="gate-controls mt-4">
+                                <button id="btn-open-gate" class="btn btn-success btn-lg me-2">
+                                    <i class="fas fa-door-open"></i> Abrir
+                                </button>
+                                <button id="btn-close-gate" class="btn btn-danger btn-lg">
+                                    <i class="fas fa-door-closed"></i> Fechar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Conexão Bluetooth -->
+                <div class="col-md-6 mb-4">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0"><i class="fab fa-bluetooth"></i> Conexão Bluetooth</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="text-center mb-4">
+                                <div id="bluetooth-connection-status" class="connection-status disconnected">
+                                    <i class="fab fa-bluetooth-b"></i>
+                                    <span id="connection-status-text">Desconectado</span>
+                                </div>
+                            </div>
+                            <div class="d-grid">
+                                <button id="btn-connect-bluetooth" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-plug"></i> Conectar Bluetooth
+                                </button>
+                            </div>
+                            <div class="device-info mt-3">
+                                <p><strong>Dispositivo:</strong> <span id="device-name">Nenhum</span></p>
+                                <p><strong>Status:</strong> <span id="connection-details">Não conectado</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Logs Recentes -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="fas fa-history"></i> Atividades Recentes</h5>
+                            <a href="#" class="btn btn-sm btn-light" data-page="logs">Ver Todos</a>
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>Data/Hora</th>
+                                            <th>Evento</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recent-logs">
+                                        <tr>
+                                            <td colspan="3" class="text-center">Nenhum registro encontrado</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Logs -->
+        <section id="page-logs" class="page-section">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-list"></i> Registros de Atividade</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Filtros -->
+                    <div class="row mb-3">
+                        <div class="col-md-3 mb-2">
+                            <label for="filter-date" class="form-label">Data</label>
+                            <input type="date" id="filter-date" class="form-control">
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label for="filter-type" class="form-label">Tipo</label>
+                            <select id="filter-type" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="ACCESS">Acesso</option>
+                                <option value="OPERATION">Operação</option>
+                                <option value="CONFIG">Configuração</option>
+                                <option value="ERROR">Erro</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <label for="filter-status" class="form-label">Status</label>
+                            <select id="filter-status" class="form-select">
+                                <option value="">Todos</option>
+                                <option value="SUCCESS">Sucesso</option>
+                                <option value="FAILURE">Falha</option>
+                                <option value="WARNING">Alerta</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2 d-flex align-items-end">
+                            <button id="btn-apply-filters" class="btn btn-primary w-100">
+                                <i class="fas fa-filter"></i> Aplicar Filtros
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabela de Logs -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Data/Hora</th>
+                                    <th>Tipo</th>
+                                    <th>Evento</th>
+                                    <th>Status</th>
+                                    <th>Detalhes</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table">
+                                <!-- Os logs serão inseridos aqui via JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Paginação -->
+                    <nav aria-label="Navegação de logs">
+                        <ul class="pagination justify-content-center" id="logs-pagination">
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#" tabindex="-1">Anterior</a>
+                            </li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item disabled">
+                                <a class="page-link" href="#">Próximo</a>
+                            </li>
+                        </ul>
+                    </nav>
+                    
+                    <!-- Exportação -->
+                    <div class="d-flex justify-content-end mt-3">
+                        <button id="btn-export-csv" class="btn btn-outline-primary me-2">
+                            <i class="fas fa-file-csv"></i> Exportar CSV
+                        </button>
+                        <button id="btn-export-pdf" class="btn btn-outline-danger">
+                            <i class="fas fa-file-pdf"></i> Exportar PDF
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Configurações -->
+        <section id="page-settings" class="page-section">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-cog"></i> Configurações</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Alerta de Login Necessário -->
+                    <div id="settings-login-alert" class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Algumas configurações requerem login de administrador.
+                    </div>
+                    
+                    <!-- Configurações Básicas -->
+                    <h5 class="border-bottom pb-2 mb-3">Configurações Básicas</h5>
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="setting-attempts" class="form-label">Número de Tentativas</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="setting-attempts" min="1" max="10" value="5">
+                                    <button class="btn btn-outline-primary" id="btn-save-attempts">Salvar</button>
+                                </div>
+                                <div class="form-text">Número de tentativas incorretas permitidas antes do bloqueio.</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="setting-close-time" class="form-label">Tempo de Fechamento (segundos)</label>
+                                <div class="input-group">
+                                    <input type="number" class="form-control" id="setting-close-time" min="5" max="120" value="30">
+                                    <button class="btn btn-outline-primary" id="btn-save-close-time">Salvar</button>
+                                </div>
+                                <div class="form-text">Tempo para fechamento automático do portão após abertura.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Configurações Avançadas (Requer Admin) -->
+                    <h5 class="border-bottom pb-2 mb-3">Configurações Avançadas</h5>
+                    <div id="admin-settings" class="admin-only">
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="setting-password" class="form-label">Senha de Acesso</label>
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" id="setting-password" placeholder="Nova senha">
+                                        <button class="btn btn-outline-primary" id="btn-save-password">Alterar</button>
+                                    </div>
+                                    <div class="form-text">Senha para acesso físico ao portão.</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Modo Férias</label>
+                                    <div class="d-flex">
+                                        <div class="form-check form-switch">
+                                            <input class="form-check-input" type="checkbox" id="setting-vacation-mode">
+                                            <label class="form-check-label" for="setting-vacation-mode">Ativar Modo Férias</label>
+                                        </div>
+                                        <button class="btn btn-outline-primary ms-auto" id="btn-save-vacation-mode">Salvar</button>
+                                    </div>
+                                    <div class="form-text">Quando ativado, o portão permanecerá bloqueado para maior segurança.</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Controle de Acesso</label>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-warning" id="btn-block-access">
+                                            <i class="fas fa-ban"></i> Bloquear Acesso
+                                        </button>
+                                        <button class="btn btn-success" id="btn-unblock-access">
+                                            <i class="fas fa-check-circle"></i> Desbloquear Acesso
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label">Manutenção</label>
+                                    <div class="d-grid gap-2">
+                                        <button class="btn btn-info" id="btn-system-status">
+                                            <i class="fas fa-info-circle"></i> Verificar Status
+                                        </button>
+                                        <button class="btn btn-danger" id="btn-system-reset">
+                                            <i class="fas fa-power-off"></i> Reiniciar Sistema
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensagem para Não-Admin -->
+                    <div id="admin-required-message" class="alert alert-info">
+                        <i class="fas fa-lock"></i> Configurações avançadas requerem acesso de administrador.
+                        <a href="#" id="admin-login-link">Fazer login como administrador</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Página de Administração -->
+        <section id="page-admin" class="page-section">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-user-shield"></i> Administração</h5>
+                </div>
+                <div class="card-body">
+                    <!-- Alerta de Login Necessário -->
+                    <div id="admin-login-alert" class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> Acesso restrito. Faça login como administrador.
+                    </div>
+                    
+                    <!-- Conteúdo Admin (Visível apenas após login) -->
+                    <div id="admin-content" class="admin-only">
+                        <!-- Dashboard -->
+                        <div class="row mb-4">
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <h1 id="stat-total-access" class="display-4">0</h1>
+                                        <p class="mb-0">Acessos Totais</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <h1 id="stat-successful-access" class="display-4">0</h1>
+                                        <p class="mb-0">Acessos Bem-sucedidos</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body text-center">
+                                        <h1 id="stat-failed-access" class="display-4">0</h1>
+                                        <p class="mb-0">Acessos Negados</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 mb-3">
+                                <div class="card bg-warning text-dark">
+                                    <div class="card-body text-center">
+                                        <h1 id="stat-attempts-exceeded" class="display-4">0</h1>
+                                        <p class="mb-0">Tentativas Excedidas</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gráfico de Atividade -->
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Atividade do Portão (Últimos 7 dias)</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas id="activity-chart" height="250"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Gerenciamento de Usuários -->
+                        <h5 class="border-bottom pb-2 mb-3">Gerenciamento de Usuários</h5>
+                        <div class="row mb-4">
+                            <div class="col-md-8">
+                                <div class="table-responsive">
+                                    <table class="table table-striped table-hover">
+                                        <thead>
+                                            <tr>
+                                                <th>Usuário</th>
+                                                <th>Nível</th>
+                                                <th>Status</th>
+                                                <th>Ações</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="users-table">
+                                            <tr>
+                                                <td>admin</td>
+                                                <td><span class="badge bg-danger">Administrador</span></td>
+                                                <td><span class="badge bg-success">Ativo</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td>usuario</td>
+                                                <td><span class="badge bg-primary">Usuário</span></td>
+                                                <td><span class="badge bg-success">Ativo</span></td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-outline-primary me-1">
+                                                        <i class="fas fa-edit"></i>
+                                                    </button>
+                                                    <button class="btn btn-sm btn-outline-danger">
+                                                        <i class="fas fa-trash"></i>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-header bg-light">
+                                        <h5 class="mb-0">Adicionar Usuário</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <form id="add-user-form">
+                                            <div class="mb-3">
+                                                <label for="new-username" class="form-label">Nome de Usuário</label>
+                                                <input type="text" class="form-control" id="new-username" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="new-password" class="form-label">Senha</label>
+                                                <input type="password" class="form-control" id="new-password" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="new-user-level" class="form-label">Nível de Acesso</label>
+                                                <select class="form-select" id="new-user-level" required>
+                                                    <option value="user">Usuário</option>
+                                                    <option value="admin">Administrador</option>
+                                                </select>
+                                            </div>
+                                            <div class="d-grid">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="fas fa-user-plus"></i> Adicionar Usuário
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal de Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Login</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="login-form">
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Usuário</label>
+                            <input type="text" class="form-control" id="username" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Senha</label>
+                            <input type="password" class="form-control" id="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">Entrar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Detalhes de Log -->
+    <div class="modal fade" id="logDetailsModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">Detalhes do Log</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="log-details">
+                        <p><strong>ID:</strong> <span id="log-detail-id"></span></p>
+                        <p><strong>Data/Hora:</strong> <span id="log-detail-datetime"></span></p>
+                        <p><strong>Tipo:</strong> <span id="log-detail-type"></span></p>
+                        <p><strong>Evento:</strong> <span id="log-detail-event"></span></p>
+                        <p><strong>Status:</strong> <span id="log-detail-status"></span></p>
+                        <p><strong>Detalhes:</strong></p>
+                        <pre id="log-detail-data" class="bg-light p-2 rounded"></pre>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">Confirmação</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmation-message">Tem certeza que deseja realizar esta ação?</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirm-action">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="bg-dark text-white py-3 mt-auto">
+        <div class="container text-center">
+            <p class="mb-0">© <span id="current-year"></span> SmartGate - Controle Inteligente de Portão</p>
+            <p class="mb-0 small">Versão 1.0.0</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Bibliotecas para exportação -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    
+    <!-- Scripts da aplicação -->
+    <script src="js/bluetooth.js"></script>
+    <script src="js/storage.js"></script>
+    <script src="js/log-manager.js"></script>
+    <script src="js/config-manager.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/ui-manager.js"></script>
+    <script src="js/app.js"></script>
+    
+    <script>
+        // Atualiza o ano no rodapé
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

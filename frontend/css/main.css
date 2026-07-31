@@ -1,0 +1,226 @@
+:root {
+    --primary-color: #2979ff;
+    --primary-dark: #2255cc;
+    --secondary-color: #00c853;
+    --warning-color: #ff9800;
+    --danger-color: #f44336;
+    --success-color: #00c853;
+    --info-color: #03a9f4;
+    --gray-dark: #343a40;
+    --gray-light: #f8f9fa;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f5f5f5;
+}
+
+main {
+    flex: 1;
+}
+
+/* Status do Bluetooth */
+.bluetooth-status {
+    display: flex;
+    align-items: center;
+}
+
+.bluetooth-icon {
+    font-size: 1.5rem;
+    margin-right: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.bluetooth-icon.connected {
+    color: var(--success-color);
+}
+
+.bluetooth-icon.disconnected {
+    color: var(--gray-light);
+}
+
+.bluetooth-icon.connecting {
+    color: var(--warning-color);
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 1; }
+    100% { opacity: 0.6; }
+}
+
+/* Status do Portão */
+.gate-status-display {
+    padding: 1.5rem;
+}
+
+.gate-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1rem;
+    transition: all 0.3s ease;
+}
+
+.gate-icon.gate-open {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.gate-icon.gate-closed {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.gate-icon.gate-moving {
+    background-color: var(--warning-color);
+    color: white;
+    animation: spin 2s infinite linear;
+}
+
+.gate-icon.gate-unknown {
+    background-color: var(--gray-dark);
+    color: white;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Status de Conexão */
+.connection-status {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    padding: 1rem;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    transition: all 0.3s ease;
+}
+
+.connection-status.connected {
+    background-color: var(--success-color);
+    color: white;
+}
+
+.connection-status.disconnected {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.connection-status.connecting {
+    background-color: var(--warning-color);
+    color: white;
+    animation: pulse 1.5s infinite;
+}
+
+/* Navegação entre páginas */
+.page-section {
+    display: none;
+}
+
+.page-section.active {
+    display: block;
+}
+
+/* Área administrativa */
+.admin-only {
+    display: none;
+}
+
+.admin-mode .admin-only {
+    display: block;
+}
+
+.admin-mode #admin-required-message,
+.admin-mode #admin-login-alert {
+    display: none;
+}
+
+/* Tabelas responsivas */
+.table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Animações e transições */
+.btn {
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Badges e indicadores */
+.badge {
+    font-weight: 500;
+    padding: 0.35em 0.65em;
+}
+
+/* Formulários */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 0.25rem rgba(41, 121, 255, 0.25);
+}
+
+/* Modais */
+.modal-header {
+    border-bottom: 0;
+}
+
+.modal-footer {
+    border-top: 0;
+}
+
+/* Paginação */
+.pagination .page-link {
+    color: var(--primary-color);
+}
+
+.pagination .page-item.active .page-link {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+/* Ajustes para dispositivos móveis */
+@media (max-width: 768px) {
+    .gate-icon,
+    .connection-status {
+        transform: scale(0.8);
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .btn-lg {
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+    }
+}

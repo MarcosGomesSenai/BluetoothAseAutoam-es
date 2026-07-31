@@ -1,0 +1,4 @@
+admin/config.php
+backend/python/db.py
+*.pyc
+__pycache__/
